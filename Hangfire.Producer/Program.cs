@@ -9,7 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHangfire(opt =>
 {
-    opt.UseSqlServerStorage(builder.Configuration.GetConnectionString("DbConnection"))
+    opt.UseSqlServerStorage(builder.Configuration.GetConnectionString("DbConnectionString"))
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings();
@@ -27,14 +27,14 @@ app.UseHttpsRedirection();
 
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = new[]
-    {
+    Authorization =
+    [
         new HangfireCustomBasicAuthenticationFilter
         {
             User = app.Configuration.GetSection("HangfireOptions:User").Value,
             Pass = app.Configuration.GetSection("HangfireOptions:Pass").Value
         }
-    }
+    ]
 });
 
 app.UseAuthorization();
