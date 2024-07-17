@@ -1,7 +1,19 @@
-using Hangfire.Server;
+using Hangfire;
 
-var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<Worker>();
+var host = Host.CreateDefaultBuilder(args);
+var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
-var host = builder.Build();
-host.Run();
+host.ConfigureServices(services =>
+{
+    services.AddHangfire(opt =>
+    {
+        opt.UseSqlServerStorage(configuration.GetConnectionString("DbConnectionString"))
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings();
+    });
+
+    services.AddHangfireServer();
+});
+
+host.Build().Run();
