@@ -1,4 +1,5 @@
 using Hangfire;
+using Hangfire.Shared.Jobs;
 using HangfireBasicAuthenticationFilter;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,9 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
         }
     ]
 });
+
+RecurringJob.AddOrUpdate<ISendEmailJob>(Guid.NewGuid().ToString(),
+    x => x.Execute(), Cron.Minutely);
 
 app.UseAuthorization();
 
